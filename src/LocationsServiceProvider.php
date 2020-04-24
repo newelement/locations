@@ -111,7 +111,7 @@ class LocationsServiceProvider extends ServiceProvider
         $this->commands(Commands\InstallCommand::class);
     }
 
-    private registerNeutrinoItems()
+    private function registerNeutrinoItems()
     {
         $bond = app('NeutrinoBond');
 
@@ -125,7 +125,8 @@ class LocationsServiceProvider extends ServiceProvider
             'children' => [
                 [ 'url' => '/admin/locations', 'title' => 'All Locations' ],
                 [ 'url' => '/admin/location', 'title' => 'Create Location' ],
-            ],
+            ]
+            ]
         ];
 
         $bond->registerMenuItems($menuItems);
