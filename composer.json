@@ -1,0 +1,41 @@
+{
+    "name": "newelement/locations",
+    "description": "Locations package for Neutrino",
+    "keywords": ["location", "cms", "neutrino"],
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://neutrinocms.com",
+    "support": {
+        "issues": "https://github.com/newelement/locations/issues",
+        "source": "https://github.com/newelement/locations"
+    },
+    "authors": [
+        {
+            "name": "Don Jones",
+            "email": "newelementdesigns@me.com"
+        }
+    ],
+    "require": {
+        "newelement/neutrino": "*",
+    },
+    "autoload": {
+        "psr-4": {
+            "Newelement\\Locations\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Newelement\\Locations\\Tests\\": "tests"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Newelement\\Shoppe\\LocationsServiceProvider"
+            ],
+            "aliases": {
+                "Shoppe": "Newelement\\Locations\\Facades"
+            }
+        }
+    }
+}
