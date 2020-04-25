@@ -120,16 +120,40 @@ class LocationsServiceProvider extends ServiceProvider
             'slot' => 4,
             'url' => '/admin/locations',
             'parent_title' => 'Locations',
-            'named_route' => 'neutrino.locations',
+            'named_route' => 'locations.locations',
             'fa-icon' => 'fa-map-marked',
             'children' => [
                 [ 'url' => '/admin/locations', 'title' => 'All Locations' ],
-                [ 'url' => '/admin/location', 'title' => 'Create Location' ],
+                [ 'url' => '/admin/locations/create', 'title' => 'Create Location' ],
+                [ 'url' => '/admin/locations/levels', 'title' => 'Location Levels' ],
             ]
             ]
         ];
 
         $bond->registerMenuItems($menuItems);
+
+
+        /*
+        *
+        * SAMPLE ENQUEUE SCRIPT AND STYLES. PUBLIC AND ADMIN.
+        */
+
+        /*
+        $scripts = [
+            '/vendor/newelement/locations/js/app.js',
+        ];
+
+        $styles = [
+            '/vendor/newelement/locations/css/app.css',
+        ];
+        */
+
+        //$bond->enqueueScripts($scripts);
+        //$bond->enqueueStyles($styles);
+
+        //$bond->enqueueAdminScripts($scripts);
+        //$bond->enqueueAdminStyles($styles);
+
 
     }
 

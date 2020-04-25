@@ -4,8 +4,8 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
-use Newelement\PackageName\Traits\Seedable;
-use Newelement\PackageName\PackageNameServiceProvider;
+use Newelement\Locations\Traits\Seedable;
+use Newelement\Locations\LocationsServiceProvider;
 
 class InstallCommand extends Command
 {
