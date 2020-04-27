@@ -19,4 +19,9 @@ class Location extends Model
         return $this->hasOne('\Newelement\locations\Models\LocationLevel');
     }
 
+    public function url()
+    {
+        return '/'.config('locations.locations_slug', 'locations').'/'.$this->slug;
+    }
+
 }

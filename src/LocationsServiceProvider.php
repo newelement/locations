@@ -126,19 +126,16 @@ class LocationsServiceProvider extends ServiceProvider
                 [ 'url' => '/admin/locations', 'title' => 'All Locations' ],
                 [ 'url' => '/admin/locations/create', 'title' => 'Create Location' ],
                 [ 'url' => '/admin/locations/levels', 'title' => 'Location Levels' ],
+                [ 'url' => '/admin/locations/settings', 'title' => 'Location Settings' ],
             ]
             ]
         ];
 
         $bond->registerMenuItems($menuItems);
 
+        $bond->registerSiteMap([ 'model' => '\\Newelement\\Locations\\Models\\Location', 'key' => 'locations']);
 
-        /*
-        *
-        * SAMPLE ENQUEUE SCRIPT AND STYLES. PUBLIC AND ADMIN.
-        */
 
-        /*
         $scripts = [
             '/vendor/newelement/locations/js/app.js',
         ];
@@ -146,10 +143,10 @@ class LocationsServiceProvider extends ServiceProvider
         $styles = [
             '/vendor/newelement/locations/css/app.css',
         ];
-        */
 
-        //$bond->enqueueScripts($scripts);
-        //$bond->enqueueStyles($styles);
+
+        $bond->enqueueScripts($scripts);
+        $bond->enqueueStyles($styles);
 
         //$bond->enqueueAdminScripts($scripts);
         //$bond->enqueueAdminStyles($styles);

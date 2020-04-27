@@ -1,0 +1,135 @@
+#locations-template{
+    position: relative;
+    margin-bottom: 32px;
+
+    .locations-filter-bar{
+        background-color: #eee;
+        padding: 12px;
+    }
+
+    .locations-cols{
+        display: flex;
+        flex-wrap: wrap;
+
+        .locations-list-col{
+            width: 50%;
+            background-color: #fff;
+        }
+        .locations-map-col{
+            width: 50%;
+        }
+
+        .locations-list{
+            display: block;
+            max-height: 450px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            overflow: auto;
+            scroll-behavior: smooth;
+
+            li{
+                padding: 12px 0;
+
+                p:last-of-type{
+                    margin: 0;
+                }
+            }
+
+            li:nth-child(odd){
+                background-color: #f3f3f3;
+            }
+        }
+    }
+
+    #locations-map{
+        width: 100%;
+        height: 450px;
+    }
+
+    #locations-loader{
+        display: flex;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 20px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(000,000,000, .35);
+        z-index: 2;
+        transition: opacity .25s ease;
+        visibility: visible;
+
+        &.hide{
+            z-index: -1;
+            visibility: hidden;
+            opacity: 0;
+        }
+    }
+
+}
+
+.locations-marker-image{
+    width: 100%;
+    height: 180px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    margin-bottom: 12px;
+}
+
+.locations-item-inner{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.locations-item-label{
+    width: 10%;
+    a{
+        display: block;
+        width: 24px;
+        height: 24px;
+        border: 1px solid #222;
+        border-radius: 50%;
+        margin: 0 auto;
+        text-align: center;
+        color: #111;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background-color .25s ease, color .25s ease;
+        &:hover{
+            background-color: #333;
+            color: #fff;
+        }
+    }
+}
+
+.locations-item-info{
+    flex-grow: 2;
+    padding-right: 12px;
+}
+
+.locations-item-image{
+    width: 25%;
+    padding-right: 18px;
+
+    a{
+        width: 100%;
+        display: block;
+        cursor: pointer;
+        transition: opacity .25s ease;
+        text-decoration: none;
+        &:hover{
+            opacity: .75;
+        }
+
+        img{
+            max-width: 100%;
+            height: auto;
+        }
+    }
+}

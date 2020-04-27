@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Newelement\Locations\Models\Location;
 use Newelement\Locations\Models\LocationLevel;
 use Newelement\Locations\Models\LocationStat;
+use Newelement\Locations\Models\LocationSetting;
 use Newelement\Neutrino\Models\ObjectMedia;
 use Newelement\Neutrino\Models\CfObjectData;
 use Newelement\Neutrino\Traits\CustomFields;
@@ -76,23 +77,45 @@ class LocationsController extends Controller
         $location->postal = $request->postal;
         $location->country = $request->country;
         $location->email = $request->email;
+        $location->phone = $request->phone;
         $location->website = $request->website;
         $location->location_level_id = $request->location_level_id;
+
+        $location->keywords = $request->keywords;
+        $location->meta_description = $request->meta_description;
+        $location->social_image_1 = $request->social_image_1;
+        $location->social_image_2 = $request->social_image_2;
+        $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
+        $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
         $geocodeKey = env('GOOGLE_MAPS_API_KEY');
 
         if( $geocodeKey ){
-            $location = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
-            $geoData = file_get_contents('https://api.geocod.io/v1.4/geocode?api_key='.$geocodeKey.'&q='.$location);
+            $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-            $json = json_decode($geoData);
-            dd($json);
-            if( $json->error ){
-                return redirect()->back()->with('error', $json->error);
-            }
+            $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$geocodeKey.'&address='.$address);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $geoData = '';
+                if( ($geoData = curl_exec($ch) ) === false){
+                    $err = curl_error($ch);
+                    return redirect()->back()->with('error', $err);
+                }
 
-            $lat = $json->results[0]->location->lat;
-            $lng = $json->results[0]->location->lng;
+                $info = curl_getinfo($ch);
+                if( $info['http_code'] === 403 ){
+                    return redirect()->back()->with('error', 'Geocoding API error. Invalid key.');
+                }
+
+                curl_close($ch);
+
+                $json = json_decode($geoData);
+
+                if( $json->status !== 'OK' ){
+                    return redirect()->back()->with('error', 'Geocoding API error. '.$json->status. ' - '.$json->error_message);
+                }
+
+            $lat = $json->results[0]->geometry->location->lat;
+            $lng = $json->results[0]->geometry->location->lng;
 
             $location->lat = $lat;
             $location->lng = $lng;
@@ -151,22 +174,55 @@ class LocationsController extends Controller
         $location->postal = $request->postal;
         $location->country = $request->country;
         $location->email = $request->email;
+        $location->phone = $request->phone;
         $location->website = $request->website;
         $location->location_level_id = $request->location_level_id;
+
+        $location->keywords = $request->keywords;
+        $location->meta_description = $request->meta_description;
+        $location->social_image_1 = $request->social_image_1;
+        $location->social_image_2 = $request->social_image_2;
+        $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
+        $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
         $geocodeKey = env('GOOGLE_MAPS_API_KEY');
 
         if( $geocodeKey ){
-            $location = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
-            $geoData = file_get_contents('https://api.geocod.io/v1.4/geocode?api_key='.$geocodeKey.'&q='.$location);
 
-            $json = json_decode($geoData);
+            if( $location->street !== $request->street ||
+                $location->city !== $request->city ||
+                $location->state !== $request->state ||
+                $location->postal !== $request->postal ){
 
-            $lat = $json->results[0]->location->lat;
-            $lng = $json->results[0]->location->lng;
+                $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-            $location->lat = $lat;
-            $location->lng = $lng;
+                $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$geocodeKey.'&address='.$address);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $geoData = '';
+                if( ($geoData = curl_exec($ch) ) === false){
+                    $err = curl_error($ch);
+                    return redirect()->back()->with('error', $err);
+                }
+
+                $info = curl_getinfo($ch);
+                if( $info['http_code'] === 403 ){
+                    return redirect()->back()->with('error', 'Geocoding API error. Invalid key.');
+                }
+
+                curl_close($ch);
+
+                $json = json_decode($geoData);
+
+                if( $json->status !== 'OK' ){
+                    return redirect()->back()->with('error', 'Geocoding API error. '.$json->status. ' - '.$json->error_message);
+                }
+
+                $lat = $json->results[0]->geometry->location->lat;
+                $lng = $json->results[0]->geometry->location->lng;
+
+                $location->lat = $lat;
+                $location->lng = $lng;
+            }
 
         } else {
             $location->lat = $request->lat;
@@ -267,4 +323,75 @@ class LocationsController extends Controller
 
         return redirect('/admin/locations/levels')->with('success', 'Location level deleted.');
     }
+
+    public function getSettings()
+    {
+        $settingsObj = LocationSetting::all();
+        $settings = [];
+        foreach( $settingsObj as $setting ){
+            $settings[$setting->name] = $setting->value_string? $setting->value_string : (int) $setting->value_bool;
+        }
+        return view('locations::admin.settings', ['settings' => $settings]);
+    }
+
+    public function updateSettings(Request $request)
+    {
+        if ($request->hasFile('pin_image')) {
+            $path = $request->pin_image->store( 'images', 'public');
+            LocationSetting::where(['name' => 'pin_image'])->update([
+                'value_string' => $path
+            ]);
+        }
+
+        LocationSetting::where(['name' => 'default_radius'])->update([
+            'value_string' => $request->default_radius
+        ]);
+
+        LocationSetting::where(['name' => 'pin_color'])->update([
+            'value_string' => $request->pin_color
+        ]);
+
+        LocationSetting::where(['name' => 'pin_label_color'])->update([
+            'value_string' => $request->pin_label_color
+        ]);
+
+        LocationSetting::where(['name' => 'show_level'])->update([
+            'value_bool' => $request->boolean('show_level')
+        ]);
+
+        LocationSetting::where(['name' => 'marker_size_width'])->update([
+            'value_string' => $request->marker_size_width
+        ]);
+
+        LocationSetting::where(['name' => 'marker_size_height'])->update([
+            'value_string' => $request->marker_size_height
+        ]);
+
+        LocationSetting::where(['name' => 'marker_label_x'])->update([
+            'value_string' => $request->marker_label_x
+        ]);
+
+        LocationSetting::where(['name' => 'marker_label_y'])->update([
+            'value_string' => $request->marker_label_y
+        ]);
+
+        LocationSetting::where(['name' => 'marker_anchor_x'])->update([
+            'value_string' => $request->marker_anchor_x
+        ]);
+
+        LocationSetting::where(['name' => 'marker_anchor_y'])->update([
+            'value_string' => $request->marker_anchor_y
+        ]);
+
+        LocationSetting::where(['name' => 'marker_origin_x'])->update([
+            'value_string' => $request->marker_origin_x
+        ]);
+
+        LocationSetting::where(['name' => 'marker_origin_y'])->update([
+            'value_string' => $request->marker_origin_y
+        ]);
+
+        return redirect('/admin/locations/settings')->with('success', 'Settings updated.');
+    }
+
 }

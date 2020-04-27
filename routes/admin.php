@@ -1,5 +1,7 @@
 <?php
 
+Route::get('/locations/settings', ['uses' => 'LocationsController@getSettings', 'as' => 'locations']);
+Route::post('/locations/settings', ['uses' => 'LocationsController@updateSettings', 'as' => 'locations']);
 Route::get('/locations/levels', ['uses' => 'LocationsController@indexLevels', 'as' => 'locations']);
 Route::get('/locations/levels/{level}', ['uses' => 'LocationsController@getLevel', 'as' => 'locations']);
 Route::put('/locations/levels/{level}', ['uses' => 'LocationsController@updateLevel', 'as' => 'locations']);

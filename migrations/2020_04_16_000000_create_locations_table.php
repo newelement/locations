@@ -32,6 +32,12 @@ class CreateLocationsTable extends Migration
             $table->decimal('lat', 10,8)->nullable();
             $table->decimal('lng', 11,8)->nullable();
             $table->text('image')->nullable();
+            $table->text('keywords')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('social_image_1')->nullable();
+            $table->text('social_image_2')->nullable();
+            $table->string('sitemap_change', 10)->nullable();
+            $table->decimal('sitemap_priority', 1,1)->default(0.5);
             $table->integer('sort')->default(0);
             $table->timestamps();
             $table->softDeletes();

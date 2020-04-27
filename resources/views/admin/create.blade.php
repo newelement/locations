@@ -91,6 +91,13 @@
             </div>
 
             <div class="form-row">
+                <label class="label-col" for="phone">Phone</label>
+                <div class="input-col">
+                    <input id="phone" type="text" name="phone" value="{{ old('phone') }}" autocomplete="off">
+                </div>
+            </div>
+
+            <div class="form-row">
                 <label class="label-col" for="email">Email</label>
                 <div class="input-col">
                     <input id="email" type="text" name="email" value="{{ old('email') }}" autocomplete="off">
@@ -138,6 +145,47 @@
                 </div>
             </div>
 
+            <h3 class="cf-group-title">SEO</h3>
+
+                    <div class="form-row">
+                        <label class="label-col" for="keywords">Keywords</label>
+                        <div class="input-col">
+                            <input id="keywords" type="text" name="keywords" value="{{ old('keywords') }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label-col" for="meta-desc">Meta Description</label>
+                        <div class="input-col">
+                            <input id="meta-desc" type="text" name="meta_description" value="{{ old('meta_description') }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="label-col full-width">Sitemap</div>
+                        <div class="input-cols">
+                            <div class="input-col">
+                                <label for="sitemap-change">Change Frequency</label>
+                                <div class="select-wrapper">
+                                    <select id="sitemap-change" name="sitemap_change">
+                                        <option value=""></option>
+                                        <option value="always" {{ old('sitemap_change') === 'always'? 'selected="selected"' : '' }}>Always</option>
+                                        <option value="hourly" {{ old('sitemap_change') === 'hourly'? 'selected="selected"' : '' }}>Hourly</option>
+                                        <option value="daily" {{ old('sitemap_change') === 'daily'? 'selected="selected"' : '' }}>Daily</option>
+                                        <option value="weekly" {{ old('sitemap_change', 'weekly') === 'weekly'? 'selected="selected"' : '' }}>Weekly</option>
+                                        <option value="monthly" {{ old('sitemap_change') === 'monthly'? 'selected="selected"' : '' }}>Monthly</option>
+                                        <option value="yearly" {{ old('sitemap_change') === 'yearly'? 'selected="selected"' : '' }}>Yearly</option>
+                                        <option value="never" {{ old('sitemap_change') === 'never'? 'selected="selected"' : '' }}>Never</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="input-col">
+                                <label for="sitemap-priority">Priority (0.1 - 1.0)</label>
+                                <input id="sitemap-priority" type="number" name="sitemap_priority" value="{{ old('sitemap_priority', '0.5') }}">
+                            </div>
+                        </div>
+                    </div>
+
         </div>
 
         <aside class="sidebar">
@@ -155,6 +203,33 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-row">
+                        <label class="label-col">Social Image
+                            <a class="lfm-social-image" data-input="social-image" data-preview="social-image-preview">
+                                <i class="fas fa-image"></i> Choose
+                            </a>
+                        </label>
+                        <div class="input-col">
+                            <input id="social-image" class="file-list-input" value="" type="text" name="social_image_1">
+                            <div id="social-image-preview" class="featured-image-preview">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="label-col">Twitter Image
+                            <a class="lfm-social-image" data-input="social-image1" data-preview="social-image-preview1">
+                                <i class="fas fa-image"></i> Choose
+                            </a>
+                        </label>
+                        <div class="input-col">
+                            <input id="social-image1" class="file-list-input" value="" type="text" name="social_image_2">
+                            <div id="social-image-preview1" class="featured-image-preview">
+                            </div>
+                        </div>
+                    </div>
+
                 <button type="submit" class="btn full text-center">Create Location</button>
             </div>
         </aside>
