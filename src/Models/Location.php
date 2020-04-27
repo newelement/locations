@@ -16,7 +16,7 @@ class Location extends Model
 
     public function level()
     {
-        return $this->hasOne('\Newelement\locations\Models\LocationLevel');
+        return $this->hasOne('\Newelement\Locations\Models\LocationLevel', 'id', 'location_level_id');
     }
 
     public function url()

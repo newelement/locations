@@ -4,7 +4,7 @@ namespace Newelement\Locations\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class LocationStat extends Model
+class LocationImpression extends Model
 {
 
 

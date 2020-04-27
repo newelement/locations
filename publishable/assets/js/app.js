@@ -2078,9 +2078,37 @@ var locationsLabelIndex = 0;
 var position;
 
 function scrollToLocationItem(i) {
+  var items = document.querySelectorAll('[data-locations-item]');
+  items.forEach(function (el) {
+    el.classList.remove('active');
+  });
   var item = document.querySelector('[data-locations-item="' + i + '"]');
+  item.classList.add('active');
   var topPos = item.offsetTop;
   document.querySelector('.locations-list').scrollTop = topPos - 38;
+}
+
+function removeLocationsMessage() {
+  var $message = document.getElementById('locations-search-instructions');
+  $message.classList.add('hide');
+}
+
+function enableClickTracking() {
+  var $items = document.querySelectorAll('[data-locations-id]');
+  console.log($items);
+  $items.forEach(function (el) {
+    el.addEventListener('click', function (e) {
+      e.preventDefault();
+      var href = e.target.getAttribute('href');
+      var id = e.target.getAttribute('data-locations-id');
+      var zipcode = document.getElementById('locations-zip').value;
+      var formData = new FormData();
+      formData.append('zipcode', zipcode);
+      HTTP.post('/locations-markers-clicked/' + id, formData).then(function (response) {
+        window.location = href;
+      })["catch"](function (e) {});
+    });
+  });
 }
 
 function createMarker(latlng, listing, label, i) {
@@ -2093,7 +2121,7 @@ function createMarker(latlng, listing, label, i) {
 
   html += '<div class="marker-cols">';
   html += '<div class="marker-col">';
-  html += '<div class="marker-listing-title">' + listing.title + '</strong></div><br>';
+  html += '<div class="marker-listing-title"><strong><a data-locations-id="' + listing.id + '" href="/' + locationsSettings.locations_slug + '/' + listing.slug + '">' + listing.title + '</a></strong></div>';
   html += listing.street + '<br>';
   html += listing.city + ', ' + listing.state + ' ' + listing.postal;
   html += '</div>';
@@ -2152,12 +2180,12 @@ function createListItem(listing, label, i) {
 
   if (listing.featured_image !== null) {
     html += '<div class="locations-item-image">';
-    html += '<a href="/' + locationsSettings.locations_slug + '/' + listing.slug + '"><img src="' + listing.featured_image.file_path + '" alt="' + listing.title + '"></a>';
+    html += '<a data-locations-id="' + listing.id + '" href="/' + locationsSettings.locations_slug + '/' + listing.slug + '"><img src="' + listing.featured_image.file_path + '" alt="' + listing.title + '"></a>';
     html += '</div>';
   }
 
   html += '<div class="locations-item-info">';
-  html += '<h3><a href="/' + locationsSettings.locations_slug + '/' + listing.slug + '">' + listing.title + '</a></h3>';
+  html += '<h3><a data-locations-id="' + listing.id + '" href="/' + locationsSettings.locations_slug + '/' + listing.slug + '">' + listing.title + '</a></h3>';
 
   if (listing.website) {
     html += '<h5><a href="' + listing.website + '">' + listing.website + '</a></h5>';
@@ -2175,6 +2203,10 @@ function createListItem(listing, label, i) {
   }
 
   html += '</p></div>';
+
+  if (listing.level !== null) {
+    html += '<div class="locations-item-level"><span>' + locationsSettings.level_label + ':</span> ' + listing.level.title + '</div>';
+  }
 
   if (listing.distance) {
     html += '<div class="locations-item-distance">';
@@ -2225,6 +2257,7 @@ function filterLocations() {
   google.maps.event.addDomListener(window, 'resize', function () {
     map.setCenter(center);
   });
+  enableClickTracking();
 } // LOCATIONS
 
 
@@ -2259,12 +2292,11 @@ function loadLocationMap(lat, lng) {
 
 function loadListingMarker() {
   var latlng = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
-  var pinColor = '000000';
   var directions = '<a class="get-directions-marker" href="' + listing.link + '" >View Property</a>';
   var html = '<div class="marker-image"><img src="' + listing.image + '" alt="' + listing.title + '" width="340" height="180"></div>';
   html += '<div class="marker-cols">';
   html += '<div class="marker-col" style="margin-bottom: 12px;">';
-  html += '<div class="marker-listing-title">' + listing.title + '</strong></div><span class="marker-listing-status">' + listing.status + '</span><br>';
+  html += '<div class="marker-listing-title"><strong>' + listing.title + '</strong></div>';
   html += listing.address + '<br>';
   html += listing.city + ', ' + listing.state + ' ' + listing.zip_code;
   html += '</div>';
@@ -2316,19 +2348,33 @@ function getUserLocation() {
 }
 
 function getMarkers() {
+  if (typeof map === 'undefined') {
+    loadLocationsMap();
+  }
+
+  removeLocationsMessage();
   locationsLabelIndex = 0;
   var formData = new FormData();
   var $zipcode = document.getElementById('locations-zip');
   var $radius = document.getElementById('locations-radius');
+  var $level = document.getElementById('locations-levels');
   formData.append('zipcode', $zipcode.value);
   formData.append('radius', $radius.value);
+  formData.append('level', $level.value);
+  document.getElementById('locations-not-found').classList.add('hide');
   $locationsLoader.classList.remove('hide');
   HTTP.post('/locations-markers', formData).then(function (response) {
     locations = response.data.markers;
     filterLocations();
+
+    if (locations.length === 0) {
+      document.getElementById('locations-not-found').classList.remove('hide');
+    }
+
     $locationsLoader.classList.add('hide');
   })["catch"](function (e) {
     console.log('Error loading locations. ' + e.message);
+    document.getElementById('locations-not-found').classList.remove('hide');
     $locationsLoader.classList.add('hide');
   });
 }
@@ -2340,23 +2386,20 @@ document.addEventListener('DOMContentLoaded', function () {
     loadLocationMarker();
   }
 
-  if ($locationsMap) {
+  if ($locationsMap && locationsSettings.init_load_locations) {
     loadLocationsMap();
     getMarkers();
-
-    if ($listingFilters.length) {
-      $listingFilters.forEach(function (el) {
-        el.addEventListener('change', function () {
-          filterListings();
-        });
-      });
-    }
   }
 
   if ($locationsSearchBtn) {
     $locationsSearchBtn.addEventListener('click', function (e) {
       e.preventDefault();
-      getMarkers();
+
+      if (document.getElementById('locations-zip').value === '') {
+        alert('Please enter an address or zip code');
+      } else {
+        getMarkers();
+      }
     });
   }
 });

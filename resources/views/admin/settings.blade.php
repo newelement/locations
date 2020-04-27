@@ -1,12 +1,42 @@
 @extends('neutrino::admin.template.header-footer')
-@section('title', 'Location Settings | ')
+@section('title', 'Locations Settings | ')
 @section('content')
 <form action="/admin/locations/settings" method="post" enctype="multipart/form-data">
 @csrf
     <div class="container">
         <div class="content">
             <div class="title-search">
-                <h2>Location Settings</h2>
+                <h2>Locations Settings</h2>
+            </div>
+
+            <div class="form-row">
+                <div class="label-col" for="init-load-locations">Load All Locations First</div>
+                <div class="input-col has-checkbox">
+                    <label><input id="init-load-locations" type="checkbox" name="init_load_locations" value="1" {{ $settings['init_load_locations'] ? 'checked="checked"' : '' }}> <span>Yes</label></label>
+                </div>
+                <div class="input-notes">
+                    <span class="note">Show all locations on first page load.</span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="label-col" for="search-instructions">Search Instructions</label>
+                <div class="input-col">
+                    <input type="text" id="search-instructions" name="search_instructions" value="{{ $settings['search_instructions'] }}">
+                </div>
+                <div class="input-notes">
+                    <span class="note">Used if 'Load All Locations First' is turned off.</span>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="label-col" for="locations-not-found">Location Not Found Message</label>
+                <div class="input-col">
+                    <textarea id="locations-not-found" name="locations_not_found">{{ $settings['locations_not_found'] }}</textarea>
+                </div>
+                <div class="input-notes">
+                    <span class="note">Message displayed when no locations are found.</span>
+                </div>
             </div>
 
             <div class="form-row">
@@ -128,6 +158,13 @@
                 </div>
             </div>
 
+            <div class="form-row">
+                <label class="label-col" for="level-label">Level Label</label>
+                <div class="input-col">
+                    <input id="level-label" type="text" name="level_label" value="{{ $settings['level_label']}}" >
+                </div>
+            </div>
+
         </div>
         <aside class="sidebar">
             <div class="side-fields">
@@ -135,5 +172,5 @@
             </div>
         </aside>
     </div>
-</form>`
+</form>
 @endsection

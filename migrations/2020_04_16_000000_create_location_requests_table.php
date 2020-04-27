@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateLocationStatsTable extends Migration
+class CreateLocationRequestsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateLocationStatsTable extends Migration
      */
     public function up()
     {
-        Schema::create('location_stats', function (Blueprint $table) {
+        Schema::create('location_requests', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('location_id');
-            $table->string('hit_type', 50)->nullable();
-            $table->integer('hit_order')->default(0);
-            $table->integer('counter')->default(0);
+            $table->string('address', 300)->nullable();
+            $table->string('user_agent', 300)->nullable();
+            $table->string('source_ip', 50)->nullable();
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateLocationStatsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('location_stats');
+        Schema::drop('location_requests');
     }
 }

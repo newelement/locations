@@ -1,6 +1,7 @@
 #locations-template {
   position: relative;
   margin-bottom: 32px;
+  background-color: #fff;
 }
 
 #locations-template .locations-filter-bar {
@@ -34,10 +35,20 @@
 
 #locations-template .locations-cols .locations-list li {
   padding: 12px 0;
+  background-color: #fffff;
 }
 
 #locations-template .locations-cols .locations-list li p:last-of-type {
   margin: 0;
+}
+
+#locations-template .locations-cols .locations-list li.active {
+  background-color: #EFF2FF !important;
+}
+
+#locations-template .locations-cols .locations-list li.active .locations-item-label a {
+  color: #fff;
+  background-color: #000;
 }
 
 #locations-template .locations-cols .locations-list li:nth-child(odd) {
@@ -73,9 +84,81 @@
   opacity: 0;
 }
 
-.locations-marker-image {
+#locations-search-instructions {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 24px;
+  font-weight: 700;
   width: 100%;
-  height: 180px;
+  max-width: 80%;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+#locations-search-instructions.hide {
+  display: none;
+  z-index: -1;
+  visibilty: hidden;
+  opacity: 0;
+}
+
+#locations-not-found {
+  padding: 12px;
+  font-size: 18px;
+}
+
+#locations-not-found.hide {
+  display: none;
+}
+
+.locations-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#locations-radius,
+#locations-zip,
+#locations-levels,
+button {
+  height: 38px;
+  margin-left: 3px;
+}
+
+#locations-zip {
+  width: 200px;
+}
+
+#locations-radius,
+#locations-levels {
+  width: 150px;
+}
+
+#locations-radius,
+#locations-zip,
+#locations-levels {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 0;
+  border: 1px solid #444;
+  box-shadow: none;
+  transition: border 0.25s ease, background-color 0.25s ease;
+  outline: none;
+}
+
+#locations-radius:focus,
+#locations-zip:focus,
+#locations-levels:focus {
+  border-color: #111;
+  background-color: #f3f3f3;
+}
+
+.locations-marker-image {
+  width: 200px;
+  height: 140px;
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -115,6 +198,21 @@
   padding-right: 12px;
 }
 
+.locations-item-info h3 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.locations-item-info h5 {
+  font-weight: normal;
+  font-size: 16px;
+}
+
+.locations-item-info .locations-item-address p,
+.locations-item-info .locations-item-contact p {
+  font-size: 14px;
+}
+
 .locations-item-image {
   width: 25%;
   padding-right: 18px;
@@ -135,5 +233,36 @@
 .locations-item-image a img {
   max-width: 100%;
   height: auto;
+}
+
+@media (max-width: 840px) {
+  #locations-template {
+    position: relative;
+    margin-bottom: 32px;
+  }
+
+  #locations-template .locations-cols {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  #locations-template .locations-cols .locations-list-col {
+    width: 100%;
+  }
+
+  #locations-template .locations-cols .locations-map-col {
+    width: 100%;
+  }
+
+  .locations-filters,
+  .locations-search {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .locations-filters {
+    margin-bottom: 12px;
+  }
 }
 

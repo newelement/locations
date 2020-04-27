@@ -75,6 +75,26 @@ class LocationsSettingsSeeder extends Seeder
             [ 'value_string' => '15' ]
         );
 
+        LocationSetting::firstOrCreate(
+            [ 'name' => 'init_load_locations' ],
+            [ 'value_bool' => 1 ]
+        );
+
+        LocationSetting::firstOrCreate(
+            [ 'name' => 'locations_not_found' ],
+            [ 'value_string' => 'We could not find any locations in your area.' ]
+        );
+
+        LocationSetting::firstOrCreate(
+            [ 'name' => 'level_label' ],
+            [ 'value_string' => 'Level' ]
+        );
+
+        LocationSetting::firstOrCreate(
+            [ 'name' => 'search_instructions' ],
+            [ 'value_string' => 'Enter your address/zip code to find a nearby location.' ]
+        );
+
         /*LocationSetting::firstOrCreate(
             [
                 'name' => 'pin_image',

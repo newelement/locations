@@ -126,7 +126,8 @@ class LocationsServiceProvider extends ServiceProvider
                 [ 'url' => '/admin/locations', 'title' => 'All Locations' ],
                 [ 'url' => '/admin/locations/create', 'title' => 'Create Location' ],
                 [ 'url' => '/admin/locations/levels', 'title' => 'Location Levels' ],
-                [ 'url' => '/admin/locations/settings', 'title' => 'Location Settings' ],
+                [ 'url' => '/admin/locations/settings', 'title' => 'Locations Settings' ],
+                [ 'url' => '/admin/locations/stats', 'title' => 'Locations Stats' ],
             ]
             ]
         ];

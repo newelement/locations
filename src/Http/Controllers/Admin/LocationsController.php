@@ -5,8 +5,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Newelement\Locations\Models\Location;
 use Newelement\Locations\Models\LocationLevel;
-use Newelement\Locations\Models\LocationStat;
 use Newelement\Locations\Models\LocationSetting;
+use Newelement\Locations\Models\LocationRequest;
+use Newelement\Locations\Models\LocationImpression;
 use Newelement\Neutrino\Models\ObjectMedia;
 use Newelement\Neutrino\Models\CfObjectData;
 use Newelement\Neutrino\Traits\CustomFields;
@@ -391,7 +392,21 @@ class LocationsController extends Controller
             'value_string' => $request->marker_origin_y
         ]);
 
+        LocationSetting::where(['name' => 'locations_not_found'])->update([
+            'value_string' => $request->locations_not_found
+        ]);
+
+        LocationSetting::where(['name' => 'init_load_locations'])->update([
+            'value_bool' => $request->boolean('init_load_locations')
+        ]);
+
         return redirect('/admin/locations/settings')->with('success', 'Settings updated.');
+    }
+
+    public function getStats(Request $request)
+    {
+        $stats = [];
+        return view('locations::admin.stats', ['stats' => $stats]);
     }
 
 }
