@@ -52,19 +52,24 @@ class LocationsController extends Controller
 
     public function getMarkers(Request $request)
     {
-        if( $request->zipcode ){
+        if( $request->zipcode || ( $request->lat && $request->lng ) ){
 
             $zipcode = $request->zipcode;
             $radius = (int) $request->radius? $request->radius : 50;
 
 
-            $latLng = $this->getLatLng($zipcode);
-            if( !$latLng['success'] ){
-                return response()->json(['error' => $latLng['message']], 500);
-            }
+            if( !$request->lat && !$request->lng ){
+                $latLng = $this->getLatLng($zipcode);
+                if( !$latLng['success'] ){
+                    return response()->json(['error' => $latLng['message']], 500);
+                }
 
-            $latitude = $latLng['lat'];
-            $longitude = $latLng['lng'];
+                $latitude = $latLng['lat'];
+                $longitude = $latLng['lng'];
+            } else {
+                $latitude = $request->lat;
+                $longitude = $request->lng;
+            }
 
             $filters = [];
             if( $request->level ){
@@ -80,7 +85,7 @@ class LocationsController extends Controller
             ->orderBy("distance", 'asc')
             ->get();
 
-            $i = 0;
+            $i = 1;
             foreach( $markers as $key => $marker ){
 
                 $markers[$key]->featured_image = ObjectMedia::where(['object_type' => 'location', 'featured' => 1, 'object_id' => $marker->id])->first();

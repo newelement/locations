@@ -40,6 +40,10 @@
                 </table>
             </div>
 
+            <div class="pagination-links">
+                {{ $locations->appends($_GET)->links() }}
+            </div>
+
         </div>
     </div>
 @endsection

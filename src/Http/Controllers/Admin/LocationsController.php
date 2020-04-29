@@ -20,7 +20,7 @@ class LocationsController extends Controller
 
     public function index(Request $request)
     {
-        $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->get();
+        $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->paginate(40);
 
         if( $request->ajax() ){
             return response()->json($location);
@@ -406,7 +406,156 @@ class LocationsController extends Controller
     public function getStats(Request $request)
     {
         $stats = [];
-        return view('locations::admin.stats', ['stats' => $stats]);
+
+        if( $request->s ){
+
+            $validatedData = $request->validate([
+                'start_date' => 'required',
+                'end_date' => 'required',
+            ]);
+
+        }
+
+        if( !$request->s ){
+
+            $sqlClicked = '
+                SELECT COUNT( location_id ) AS location_count, l.*, l.id AS id
+                FROM location_requests AS lr
+                JOIN locations AS l ON l.id = lr.location_id ';
+
+            $sqlClicked .= '
+                GROUP BY location_id
+                ORDER BY location_count DESC
+                LIMIT 10
+                ';
+
+            $stats['top_clicked'] = \DB::select($sqlClicked);
+
+            $sqlImp = '
+                SELECT
+                    ROUND(AVG(DISTINCT location_pos)) AS avg_pos,
+                    l.*,
+                    l.id AS id
+                FROM location_impressions AS li
+                JOIN locations AS l ON l.id = li.location_id ';
+
+            $sqlImp .= '
+                GROUP BY li.location_id
+                ORDER BY avg_pos DESC, l.title ASC
+                LIMIT 10
+                ';
+
+            $stats['top_impressions'] = \DB::select($sqlImp);
+
+        }
+
+        if( $request->s ){
+
+            // CLICKS
+
+
+            $clicks = $this->getClicks($request);
+            $stats['clicks'] = $clicks;
+
+
+            // IMPRESSIONS
+            $impressions = $this->getImpressions($request);
+            $stats['impressions'] = $impressions;
+
+        }
+
+        $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->get();
+
+        return view('locations::admin.stats', ['stats' => $stats, 'locations' => $locations]);
+    }
+
+    private function getClicks($request)
+    {
+        $startDate = \Carbon\Carbon::create($request->start_date)->startOfDay();
+        $endDate = \Carbon\Carbon::create($request->end_date)->endOfDay();
+
+        $query = \DB::table('location_requests');
+            $query->join('locations as l', 'l.id', '=', 'location_requests.location_id')
+            ->whereBetween('location_requests.created_at', [$startDate->timezone('UTC')->toDateTimeString(), $endDate->timezone('UTC')->toDateTimeString()]);
+
+        if( $request->location_id ){
+            $query->where('l.id', $request->location_id);
+        }
+
+        $query->groupBy('location_requests.location_id')
+                ->selectRaw('COUNT( location_id ) AS location_count, l.*, l.id AS id, location_requests.created_at AS created_at')
+                ->orderByRaw('COUNT( location_id ) desc')
+                ->orderby('l.title', 'asc');
+
+        return $query->get();
+    }
+
+    private function getImpressions($request)
+    {
+        $startDate = \Carbon\Carbon::create($request->start_date)->startOfDay();
+        $endDate = \Carbon\Carbon::create($request->end_date)->endOfDay();
+
+        $query2 = \DB::table('location_impressions');
+
+        $query2->join('locations as l', 'l.id', '=', 'location_impressions.location_id')
+                    ->whereBetween('location_impressions.created_at', [$startDate->timezone('UTC')->toDateTimeString(), $endDate->timezone('UTC')->toDateTimeString()]);
+
+        if( $request->location_id ){
+                $query2->where('l.id', $request->location_id);
+        }
+
+        $query2->groupBy('location_impressions.location_id')
+                                ->selectRaw('ROUND(AVG(DISTINCT location_pos)) AS avg_pos, l.*, l.id AS id, location_impressions.created_at AS created_at')
+                                ->orderByRaw('ROUND(AVG(DISTINCT location_pos)) desc')
+                                ->orderby('l.title', 'asc');
+
+        return $query2->get();
+    }
+
+    public function exportStats(Request $request)
+    {
+        $type = $request->type === 'clicks'? 'clicks' : 'impressions';
+        $date = date('Y-m-d');
+
+        $headers = [
+                'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0'
+            ,   'Content-type'        => 'text/csv'
+            ,   'Content-Disposition' => 'attachment; filename='.$type.'-'.$date.'.csv'
+            ,   'Expires'             => '0'
+            ,   'Pragma'              => 'no-cache'
+        ];
+
+        $list = $type === 'clicks'? $this->getClicks($request) : $this->getImpressions($request);
+        $items = [];
+        $count = $type === 'clicks'? 'clicks' : 'avg_position';
+        $columns = ['ID', 'Location', 'Street', 'City', 'State', 'Postal', $count];
+
+        foreach($list as $item){
+            $items[] = [
+               'id' => $item->id,
+               'title' => $item->title,
+               'street' => $item->street,
+               'street2' => $item->street2,
+               'city' => $item->city,
+               'state' => $item->state,
+               'postal' => $item->postal,
+               $count => $type === 'clicks'? $item->location_count : $item->avg_pos
+            ];
+        }
+
+        $filePath = \Storage::disk('local')->put($type.'-'.$date.'.csv', '');
+
+        $file = fopen(storage_path('app').'/'.$type.'-'.$date.'.csv', 'w');
+
+        fputcsv($file, $columns);
+
+        foreach($items as $item) {
+            fputcsv($file, [$item['id'], $item['title'], $item['street'], $item['city'], $item['state'], $item['postal'], $item[$count] ] );
+        }
+
+        fclose($file);
+
+        return response()->download(storage_path('app').'/'.$type.'-'.$date.'.csv')->deleteFileAfterSend();
     }
 
 }

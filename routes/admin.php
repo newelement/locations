@@ -1,7 +1,7 @@
 <?php
 
 Route::get('/locations/stats', ['uses' => 'LocationsController@getStats', 'as' => 'locations']);
-Route::post('/locations/stats', ['uses' => 'LocationsController@getStats', 'as' => 'locations']);
+Route::post('/locations/stats', ['uses' => 'LocationsController@exportStats', 'as' => 'locations']);
 Route::get('/locations/settings', ['uses' => 'LocationsController@getSettings', 'as' => 'locations']);
 Route::post('/locations/settings', ['uses' => 'LocationsController@updateSettings', 'as' => 'locations']);
 Route::get('/locations/levels', ['uses' => 'LocationsController@indexLevels', 'as' => 'locations']);

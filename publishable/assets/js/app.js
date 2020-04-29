@@ -2068,14 +2068,14 @@ var map,
     locations = [],
     infoWindow;
 var $locationsMap = document.getElementById('locations-map');
-var $locationMap = document.getElementById('location-map');
+var $locationMap = document.getElementById('location-single-map');
 var $locationsList = document.querySelector('.locations-list');
 var $listingFilters = document.querySelectorAll('.listing-filter');
 var $locationsSearchBtn = document.querySelector('.locations-search-btn');
 var $locationsLoader = document.getElementById('locations-loader');
 var locationLabels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 var locationsLabelIndex = 0;
-var position;
+var position = false;
 
 function scrollToLocationItem(i) {
   var items = document.querySelectorAll('[data-locations-item]');
@@ -2095,7 +2095,6 @@ function removeLocationsMessage() {
 
 function enableClickTracking() {
   var $items = document.querySelectorAll('[data-locations-id]');
-  console.log($items);
   $items.forEach(function (el) {
     el.addEventListener('click', function (e) {
       e.preventDefault();
@@ -2123,10 +2122,21 @@ function createMarker(latlng, listing, label, i) {
   html += '<div class="marker-col">';
   html += '<div class="marker-listing-title"><strong><a data-locations-id="' + listing.id + '" href="/' + locationsSettings.locations_slug + '/' + listing.slug + '">' + listing.title + '</a></strong></div>';
   html += listing.street + '<br>';
+
+  if (listing.street2 !== null) {
+    html += listing.street2 + '<br>';
+  }
+
   html += listing.city + ', ' + listing.state + ' ' + listing.postal;
   html += '</div>';
   html += '<div class="marker-col">';
-  html += '<div class="marker-info"></div>';
+  html += '<div class="marker-info">';
+
+  if (listing.phone !== null) {
+    html += listing.phone;
+  }
+
+  html += '</div>';
   html += '</div>';
   html += '</div>';
   html += directions;
@@ -2276,75 +2286,92 @@ function loadLocationsMap() {
 } // LOCATION SINGLE
 
 
-function loadLocationMap(lat, lng) {
-  map = new google.maps.Map(listingMap, {
-    center: new google.maps.LatLng(lat, lng),
+function loadLocationMap() {
+  map = new google.maps.Map($locationMap, {
+    center: new google.maps.LatLng(singleLocation.lat, singleLocation.lng),
     zoom: 12,
     mapTypeId: 'roadmap',
     scrollwheel: false,
     mapTypeControlOptions: {
       style: google.maps.MapTypeControlStyle.DROPDOWN_MENU
-    },
-    styles: mapTheme
+    } //styles: mapTheme
+
   });
   infoWindow = new google.maps.InfoWindow();
 }
 
-function loadListingMarker() {
-  var latlng = new google.maps.LatLng(parseFloat(lat), parseFloat(lng));
-  var directions = '<a class="get-directions-marker" href="' + listing.link + '" >View Property</a>';
-  var html = '<div class="marker-image"><img src="' + listing.image + '" alt="' + listing.title + '" width="340" height="180"></div>';
+function loadLocationMarker() {
+  var latlng = new google.maps.LatLng(parseFloat(singleLocation.lat), parseFloat(singleLocation.lng));
+  var directions = '<a class="get-directions-marker" href="https://maps.google.com?daddr=' + singleLocation.street + ' ' + singleLocation.city + ' ' + singleLocation.state + ' ' + singleLocation.postal + '" target="_blank">Get directions</a>';
+  var html = '';
+
+  if (singleLocation.featured_image !== null) {
+    html += '<div class="locations-marker-image" style="background-image: url(\'' + singleLocation.featured_image.file_path + '\')"></div>';
+  }
+
   html += '<div class="marker-cols">';
-  html += '<div class="marker-col" style="margin-bottom: 12px;">';
-  html += '<div class="marker-listing-title"><strong>' + listing.title + '</strong></div>';
-  html += listing.address + '<br>';
-  html += listing.city + ', ' + listing.state + ' ' + listing.zip_code;
+  html += '<div class="marker-col">';
+  html += '<div class="marker-listing-title"><strong>' + singleLocation.title + '</strong></div>';
+  html += singleLocation.street + '<br>';
+
+  if (singleLocation.street2 !== null) {
+    html += singleLocation.street2 + '<br>';
+  }
+
+  html += singleLocation.city + ', ' + singleLocation.state + ' ' + singleLocation.postal;
   html += '</div>';
   html += '<div class="marker-col">';
-  html += '<div class="marker-listing-price">' + listing.price + '</div>';
+  html += '<div class="marker-info">';
 
-  if (listing.building_size) {
-    html += 'Building size: ' + listing.building_size + '<br>';
+  if (singleLocation.phone !== null) {
+    html += singleLocation.phone;
   }
 
-  if (listing.available_space) {
-    html += 'Available space: ' + listing.available_space;
-  }
-
+  html += '</div>';
   html += '</div>';
   html += '</div>';
   html += directions;
-  var icon = {
-    url: '',
-    scaledSize: new google.maps.Size(30, 37),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(10, 34),
-    labelOrigin: new google.maps.Point(15, 15)
-  };
-  var marker = new google.maps.Marker({
+  var icon = {};
+
+  if (locationsSettings.pin_image) {
+    icon = {
+      url: '/' + locationsSettings.pin_image,
+      scaledSize: new google.maps.Size(parseInt(locationsSettings.marker_size_width), parseInt(locationsSettings.marker_size_height)),
+      origin: new google.maps.Point(parseInt(locationsSettings.marker_origin_x), parseInt(locationsSettings.marker_origin_y)),
+      anchor: new google.maps.Point(parseInt(locationsSettings.marker_anchor_x), parseInt(locationsSettings.marker_anchor_y)),
+      labelOrigin: new google.maps.Point(parseInt(locationsSettings.marker_label_x), parseInt(locationsSettings.marker_label_y))
+    };
+  } else {
+    icon = {
+      path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z',
+      fillColor: locationsSettings.pin_color,
+      fillOpacity: 1,
+      strokeWeight: 0,
+      scale: 1.1,
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(10, 34),
+      labelOrigin: new google.maps.Point(0, -30)
+    };
+  }
+
+  var markerData = {
     map: map,
     position: latlng,
-    label: 'A' //icon: icon
-
-  });
+    label: {
+      text: 'A',
+      color: locationsSettings.pin_label_color
+    }
+  };
+  markerData.icon = icon;
+  var marker = new google.maps.Marker(markerData);
   google.maps.event.addListener(marker, 'click', function () {
     infoWindow.setContent(html);
     infoWindow.open(map, marker);
   });
-  markers.push(marker);
   var center = map.getCenter();
   google.maps.event.addDomListener(window, 'resize', function () {
     map.setCenter(center);
   });
-}
-
-function getUserLocation() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function (position) {
-      console.log(position);
-      position = position;
-    });
-  }
 }
 
 function getMarkers() {
@@ -2361,6 +2388,12 @@ function getMarkers() {
   formData.append('zipcode', $zipcode.value);
   formData.append('radius', $radius.value);
   formData.append('level', $level.value);
+
+  if (position) {
+    formData.append('lat', position.coords.latitude);
+    formData.append('lng', position.coords.longitude);
+  }
+
   document.getElementById('locations-not-found').classList.add('hide');
   $locationsLoader.classList.remove('hide');
   HTTP.post('/locations-markers', formData).then(function (response) {
@@ -2379,16 +2412,30 @@ function getMarkers() {
   });
 }
 
+function getUserLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function (coords) {
+      position = coords;
+      loadLocationsMap();
+      getMarkers();
+    });
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   // LOCATION SINGLE
   if ($locationMap) {
-    loadLocationMap(lat, lng);
+    loadLocationMap();
     loadLocationMarker();
   }
 
   if ($locationsMap && locationsSettings.init_load_locations) {
     loadLocationsMap();
     getMarkers();
+  }
+
+  if ($locationsMap && !locationsSettings.ini_load_locations) {
+    getUserLocation();
   }
 
   if ($locationsSearchBtn) {

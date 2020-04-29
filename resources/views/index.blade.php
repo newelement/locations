@@ -16,8 +16,8 @@ $socialImages = getImageSizes($data->social_image_1);
 
 @section('content')
 
-<main class="main">
-    <div class="container">
+<main class="main pt-4">
+    <div class="container pt-2">
         <h2>Locations</h2>
 
         <div id="locations-template">
@@ -38,7 +38,7 @@ $socialImages = getImageSizes($data->social_image_1);
                     @endif
                 </div>
                 <div class="locations-search">
-                    <input id="locations-zip" type="text" placeholder="Zip code / Address">
+                    <input id="locations-zip" type="text" placeholder="Zip code / Address" required>
                     <select id="locations-radius">
                         <option value="10" {{ $settings['default_radius'] === '10'? 'selected="selected"' : '' }}>10 miles</option>
                         <option value="25" {{ $settings['default_radius'] === '25'? 'selected="selected"' : '' }}>25 miles</option>
