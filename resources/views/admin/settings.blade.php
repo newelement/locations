@@ -32,7 +32,7 @@
             <div class="form-row">
                 <label class="label-col" for="locations-not-found">Location Not Found Message</label>
                 <div class="input-col">
-                    <textarea id="locations-not-found" name="locations_not_found">{{ $settings['locations_not_found'] }}</textarea>
+                    <input type="text" id="locations-not-found" name="locations_not_found" value="{{ $settings['locations_not_found'] }}">
                 </div>
                 <div class="input-notes">
                     <span class="note">Message displayed when no locations are found.</span>
