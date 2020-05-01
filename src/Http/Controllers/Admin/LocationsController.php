@@ -424,7 +424,7 @@ class LocationsController extends Controller
                 JOIN locations AS l ON l.id = lr.location_id ';
 
             $sqlClicked .= '
-                GROUP BY location_id
+                GROUP BY location_id, l.id
                 ORDER BY location_count DESC
                 LIMIT 10
                 ';
@@ -440,7 +440,7 @@ class LocationsController extends Controller
                 JOIN locations AS l ON l.id = li.location_id ';
 
             $sqlImp .= '
-                GROUP BY li.location_id
+                GROUP BY li.location_id, l.id
                 ORDER BY avg_pos DESC, l.title ASC
                 LIMIT 10
                 ';
