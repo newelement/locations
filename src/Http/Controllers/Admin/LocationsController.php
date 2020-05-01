@@ -482,7 +482,7 @@ class LocationsController extends Controller
             $query->where('l.id', $request->location_id);
         }
 
-        $query->groupBy('location_requests.location_id')
+        $query->groupBy('location_requests.location_id', 'l.id', 'location_requests.created_at')
                 ->selectRaw('COUNT( location_id ) AS location_count, l.*, l.id AS id, location_requests.created_at AS created_at')
                 ->orderByRaw('COUNT( location_id ) desc')
                 ->orderby('l.title', 'asc');
@@ -504,7 +504,7 @@ class LocationsController extends Controller
                 $query2->where('l.id', $request->location_id);
         }
 
-        $query2->groupBy('location_impressions.location_id')
+        $query2->groupBy('location_impressions.location_id', 'l.id', 'location_impressions.created_at')
                                 ->selectRaw('ROUND(AVG(DISTINCT location_pos)) AS avg_pos, l.*, l.id AS id, location_impressions.created_at AS created_at')
                                 ->orderByRaw('ROUND(AVG(DISTINCT location_pos)) desc')
                                 ->orderby('l.title', 'asc');
