@@ -37,11 +37,13 @@ class LocationsServiceProvider extends ServiceProvider
     {
 
         $viewsDirectory = __DIR__.'/../resources/views';
+        $adminViewsDirectory = __DIR__.'/../resources/views/admin';
         $publishAssetsDirectory = __DIR__.'/../publishable/assets';
 
         $this->loadViewsFrom($viewsDirectory, 'locations');
 
         $this->publishes([$viewsDirectory => base_path('resources/views/vendor/locations')], 'views');
+        $this->publishes([$adminViewsDirectory => base_path('resources/views/vendor/locations/admin')], 'adminviews');
         $this->publishes([ $publishAssetsDirectory => public_path('vendor/newelement/locations') ], 'public');
         $this->loadMigrationsFrom(realpath(__DIR__.'/../migrations'));
 
