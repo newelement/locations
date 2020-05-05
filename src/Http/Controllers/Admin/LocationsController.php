@@ -18,6 +18,13 @@ class LocationsController extends Controller
 
     use CustomFields;
 
+    private $geoCodeKey;
+
+    function __construct()
+    {
+        $this->geoCodeKey = env('GOOGLE_MAPS_API_KEY_SERVER');
+    }
+
     public function index(Request $request)
     {
         $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->paginate(40);
@@ -89,12 +96,10 @@ class LocationsController extends Controller
         $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
         $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
-        $geocodeKey = env('GOOGLE_MAPS_API_KEY');
-
-        if( $geocodeKey ){
+        if( $this->geocodeKey ){
             $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-            $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$geocodeKey.'&address='.$address);
+            $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geocodeKey.'&address='.$address);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $geoData = '';
                 if( ($geoData = curl_exec($ch) ) === false){
@@ -186,9 +191,7 @@ class LocationsController extends Controller
         $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
         $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
-        $geocodeKey = env('GOOGLE_MAPS_API_KEY');
-
-        if( $geocodeKey ){
+        if( $this->geocodeKey ){
 
             if( $location->street !== $request->street ||
                 $location->city !== $request->city ||
@@ -197,7 +200,7 @@ class LocationsController extends Controller
 
                 $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-                $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$geocodeKey.'&address='.$address);
+                $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geocodeKey.'&address='.$address);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $geoData = '';
                 if( ($geoData = curl_exec($ch) ) === false){

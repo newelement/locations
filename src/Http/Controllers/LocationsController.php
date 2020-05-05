@@ -109,7 +109,7 @@ class LocationsController extends Controller
 
     private function getLatLng($address, $position = false)
     {
-        $geocodeKey = env('GOOGLE_MAPS_API_KEY');
+        $geocodeKey = env('GOOGLE_MAPS_API_KEY_SERVER');
 
         if( !strlen($geocodeKey) ){
             return ['success' => false, 'message' => 'No Google Maps API key.'];

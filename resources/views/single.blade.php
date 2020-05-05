@@ -71,8 +71,8 @@ $socialImages = getImageSizes($data->social_image);
 @endsection
 
 @prepend('footerscripts')
-@if( env('GOOGLE_MAPS_API_KEY') )
-<script src="https://maps.google.com/maps/api/js?key={{env('GOOGLE_MAPS_API_KEY')}}"></script>
+@if( env('GOOGLE_MAPS_API_KEY_FRONTEND') )
+<script src="https://maps.google.com/maps/api/js?key={{env('GOOGLE_MAPS_API_KEY_FRONTEND')}}"></script>
 @endif
 <script>
     window.locationsSettings = {!! json_encode($settings) !!};
