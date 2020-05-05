@@ -76,13 +76,14 @@ class LocationsController extends Controller
                 $filters['location_level_id'] = $request->level;
             }
 
-            $markers = Location::selectRaw("
+            $markers = Location::selectRaw( "
                         id, title, slug, street, street2, short_description, city, state, postal, country, website, phone, email, lat, lng,
-                        ( 3956 * acos( cos( radians( ? ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( lat ) ) ) ) AS distance
+                        ( 3956 * acos( cos( radians( ? ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( lat ) ) ) )
+                            AS distance
                         ", [$latitude, $longitude, $latitude])
-            ->having('distance', '<', $radius)
+            ->whereRaw('( 3956 * acos( cos( radians( ? ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( lat ) ) ) ) < ?', [$latitude, $longitude, $latitude, $radius])
             ->where($filters)
-            ->orderBy("distance", 'asc')
+            ->orderByRaw('( 3956 * acos( cos( radians( ? ) ) * cos( radians( lat ) ) * cos( radians( lng ) - radians( ? ) ) + sin( radians( ? ) ) * sin( radians( lat ) ) ) ) asc', [$latitude, $longitude, $latitude])
             ->get();
 
             $i = 1;
@@ -90,6 +91,7 @@ class LocationsController extends Controller
 
                 $markers[$key]->featured_image = ObjectMedia::where(['object_type' => 'location', 'featured' => 1, 'object_id' => $marker->id])->first();
                 $markers[$key]->level = LocationLevel::where(['id' => $marker->location_level_id])->first();
+                $markers[$key]->distance = (float) $marker->distance;
 
                 $locationImp = new LocationImpression;
                 $locationImp->location_id = $marker->id;

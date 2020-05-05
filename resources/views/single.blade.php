@@ -22,13 +22,14 @@ $socialImages = getImageSizes($data->social_image);
             </div>
         </div>
         <div class="row">
+        @if($data->featuredImage)
             <div class="col-md-4 location-image mb-4">
             @php
             $images = getImageSizes($data->featuredImage->file_path);
             @endphp
             <img src="{{ $images['medium'] }}" alt="{{ $data->title }}">
-
             </div>
+        @endif
             <div class="col-md-4 pl-4">
                 <h2>{{ $data->title }}</h2>
 
