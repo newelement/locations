@@ -341,7 +341,9 @@ function getMarkers(){
     let $level = document.getElementById('locations-levels');
     formData.append('zipcode', $zipcode.value );
     formData.append('radius', $radius.value );
-    formData.append('level', $level.value );
+    if( $level ){
+        formData.append('level', $level.value );
+    }
 
     if( position ){
         formData.append('lat', position.coords.latitude )
