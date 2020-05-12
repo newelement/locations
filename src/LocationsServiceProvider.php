@@ -137,6 +137,17 @@ class LocationsServiceProvider extends ServiceProvider
 
         $bond->registerMenuItems($menuItems);
 
+        $packageInfo = [
+            'package_name' => 'Locations',
+            'version' => '0.7.710',
+            'description' => 'Multiple locations Google map package. Uses geolocation.',
+            'website' => 'https://neutrinocms.com',
+            'repo' => 'https://github.com/newelement/locations',
+            'image' => '',
+        ];
+
+        $bond->registerPackage($packageInfo);
+
         $bond->registerSiteMap([ 'model' => '\\Newelement\\Locations\\Models\\Location', 'key' => 'locations']);
 
 
