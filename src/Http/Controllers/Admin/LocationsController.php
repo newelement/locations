@@ -399,6 +399,10 @@ class LocationsController extends Controller
             'value_string' => $request->locations_not_found
         ]);
 
+        LocationSetting::where(['name' => 'search_instructions'])->update([
+            'value_string' => $request->search_instructions
+        ]);
+
         LocationSetting::where(['name' => 'init_load_locations'])->update([
             'value_bool' => $request->boolean('init_load_locations')
         ]);
