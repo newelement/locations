@@ -64,7 +64,6 @@ class InstallCommand extends Command
         $process->setWorkingDirectory(base_path())->run();
 
         $this->info('Seeding data into the database');
-        //$this->seed('LocationsDatabaseSeeder');
         $this->call('db:seed', ['--class' => 'Newelement\\Locations\\Database\\Seeds\\LocationsDatabaseSeeder']);
 
         $this->info('Clearing application cache...');

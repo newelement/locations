@@ -81,10 +81,7 @@ class LocationsServiceProvider extends ServiceProvider
         $publishable = [
             'config' => [
                 "{$publishablePath}/config/locations.php" => config_path('locations.php'),
-            ],
-            'seeds' => [
-                "{$publishablePath}/database/seeds/" => database_path('seeds'),
-            ],
+            ]
         ];
         foreach ($publishable as $group => $paths) {
             $this->publishes($paths, $group);
