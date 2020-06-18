@@ -96,10 +96,10 @@ class LocationsController extends Controller
         $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
         $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
-        if( $this->geocodeKey ){
+        if( $this->geoCodeKey ){
             $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-            $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geocodeKey.'&address='.$address);
+            $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geoCodeKey.'&address='.$address);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $geoData = '';
                 if( ($geoData = curl_exec($ch) ) === false){
@@ -191,7 +191,7 @@ class LocationsController extends Controller
         $location->sitemap_change = $request->sitemap_change? $request->sitemap_change : 'weekly';
         $location->sitemap_priority = $request->sitemap_priority? $request->sitemap_priority : 0.5;
 
-        if( $this->geocodeKey ){
+        if( $this->geoCodeKey ){
 
             if( $location->street !== $request->street ||
                 $location->city !== $request->city ||
@@ -200,7 +200,7 @@ class LocationsController extends Controller
 
                 $address = urlencode($request->street.' '.$request->city.' '.$request->state.' '.$request->postal);
 
-                $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geocodeKey.'&address='.$address);
+                $ch = curl_init('https://maps.googleapis.com/maps/api/geocode/json?key='.$this->geoCodeKey.'&address='.$address);
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 $geoData = '';
                 if( ($geoData = curl_exec($ch) ) === false){
