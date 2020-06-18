@@ -137,7 +137,7 @@
                             <option value="10" {{ $settings['default_radius'] === '10'? 'selected="selected"' : '' }}>10 miles</option>
                             <option value="25" {{ $settings['default_radius'] === '25'? 'selected="selected"' : '' }}>25 miles</option>
                             <option value="50" {{ $settings['default_radius'] === '50'? 'selected="selected"' : '' }}>50 miles</option>
-                            <option value="100 {{ $settings['default_radius'] === '100'? 'selected="selected"' : '' }}">100 miles</option>
+                            <option value="100" {{ $settings['default_radius'] === '100'? 'selected="selected"' : '' }}">100 miles</option>
                             <option value="150" {{ $settings['default_radius'] === '150'? 'selected="selected"' : '' }}>150 miles</option>
                             <option value="200" {{ $settings['default_radius'] === '200'? 'selected="selected"' : '' }}>200 miles</option>
                         </select>
