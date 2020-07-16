@@ -5,6 +5,12 @@
         <div class="content full">
             <div class="title-search">
                 <h2>Locations <a class="headline-btn" href="/admin/locations/create" role="button">Create New Location</a></h2>
+                <div class="object-search">
+                    <form class="search-form" action="{{url()->full()}}" method="get">
+                        <input type="text" name="s" value="{{ request('s') }}" placeholder="Search locations" autocomplete="off">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
             </div>
 
             <div class="responsive-table">

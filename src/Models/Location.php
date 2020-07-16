@@ -4,10 +4,23 @@ namespace Newelement\Locations\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Newelement\Searchable\SearchableTrait;
 
 class Location extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, SearchableTrait;
+
+    protected $searchable = [
+        'columns' => [
+            'title' => 7,
+            'street' => 5,
+            'city' => 5,
+            'state' => 5,
+            'postal' => 5,
+            'phone' => 3,
+            'email' => 3
+        ],
+    ];
 
     public function featuredImage()
     {

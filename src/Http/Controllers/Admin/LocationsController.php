@@ -27,7 +27,11 @@ class LocationsController extends Controller
 
     public function index(Request $request)
     {
-        $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->paginate(40);
+        if( $request->s && strlen($request->s) ){
+            $locations = Location::search($request->s)->orderBy('title', 'asc')->orderBy('state', 'asc')->paginate(40);
+        } else {
+            $locations = Location::orderBy('title', 'asc')->orderBy('state', 'asc')->paginate(40);
+        }
 
         if( $request->ajax() ){
             return response()->json($location);
