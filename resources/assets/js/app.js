@@ -196,21 +196,35 @@ function clearLocations() {
 
 function filterLocations(){
     clearLocations();
-
-    var bounds = new google.maps.LatLngBounds();
-
-    locations.forEach(function(v, i) {
+    console.log(locations);
+    if( locations.length === 1 ){
         let latlng = new google.maps.LatLng(
-          parseFloat(v.lat),
-          parseFloat(v.lng)
-        );
+              parseFloat(locations[0].lat),
+              parseFloat(locations[0].lng)
+            );
         let label = locationLabels[locationsLabelIndex++ % locationLabels.length];
-        createMarker( latlng, v, label, i );
-        createListItem(v, label, i)
-        bounds.extend( latlng );
-    });
+        createMarker( latlng, locations[0], label, 0 );
+        createListItem(locations[0], label, 0)
+        map.setCenter(latlng);
+        map.setZoom(14);
+    } else {
 
-    map.fitBounds(bounds);
+        var bounds = new google.maps.LatLngBounds();
+
+        locations.forEach(function(v, i) {
+            let latlng = new google.maps.LatLng(
+              parseFloat(v.lat),
+              parseFloat(v.lng)
+            );
+            let label = locationLabels[locationsLabelIndex++ % locationLabels.length];
+            createMarker( latlng, v, label, i );
+            createListItem(v, label, i)
+            bounds.extend( latlng );
+        });
+
+        map.fitBounds(bounds);
+    }
+
     let center = map.getCenter();
 
     google.maps.event.addDomListener(window, 'resize', function() {
